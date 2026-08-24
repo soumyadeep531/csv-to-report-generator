@@ -1,0 +1,58 @@
+# =====================================================================
+# Git Ignore Rules for AutoEDA & ML Report Generator
+# =====================================================================
+
+# 1. Environment Secrets & API Keys (DO NOT UPLOAD)
+.env
+.env.*
+*.env
+
+# 2. Virtual Environments
+venv/
+venv
+.venv/
+.venv
+env/
+env
+ENV/
+env.bak/
+venv.bak/
+
+# 3. Python Bytecode & Runtime Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# 4. Generated PDF Reports & Storage Artifacts
+app/storage/
+storage/
+*.pdf
+_report_images/
+app/storage/_report_images/
+
+# 5. IDE & Editor Workspace Settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 6. Operating System Artifacts
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 7. Local Private Documentation & Scratch Notes (DO NOT UPLOAD)
+PROJECT_EXPLANATION.md
+project_explanation.md
+PROJECT_GUIDE.md
+scratch/
