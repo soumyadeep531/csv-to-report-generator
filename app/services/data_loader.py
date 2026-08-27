@@ -1,36 +1,44 @@
 import pandas as pd
 from fastapi import UploadFile, HTTPException
+from app.core.config import settings
+
+MAX_FILE_SIZE_MB = 10
 
 
 def load_csv(file: UploadFile) -> pd.DataFrame:
-    """
-    Read an uploaded CSV file into a pandas DataFrame.
-    """
 
     # Check file extension
-    if not file.filename.lower().endswith(".csv"):
+    if not file.filename or not file.filename.lower().endswith(".csv"):
         raise HTTPException(
             status_code=400,
             detail="Only .csv files are supported"
         )
 
-    try:
-        # Read CSV into DataFrame
-        df = pd.read_csv(file.file)
-
-    except Exception as exc:
+    # 2. check content type
+    if file.content_type not in(
+        "text/csv",
+        "application/vnd.ms-excel",
+        "application/csv",
+        "text/plain",
+    ):
         raise HTTPException(
             status_code=400,
-            detail=f"Could not parse CSV: {exc}"
+            detail="Invalid content type for csv upload"
         )
-
-    # Make sure CSV is not empty
-    if df.empty:
+        
+        
+    file.file.seek(0,2)
+    size_mb=file.file.tell()/ (1024 * 1024)
+    file.file.seek(0)
+    
+    if size_mb>MAX_FILE_SIZE_MB:
         raise HTTPException(
-            status_code=400,
-            detail="Uploaded CSV is empty"
+            status_code=413,
+            detail=f"File exceeds {MAX_FILE_SIZE_MB} MB Limit"
         )
-
+        
+    df = pd.read_csv(file.file)
+        
     return df
 
 

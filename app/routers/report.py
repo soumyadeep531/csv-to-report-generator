@@ -8,12 +8,19 @@ from fastapi.responses import FileResponse, JSONResponse
 from app.core.config import settings
 from app.services.data_loader import load_csv
 from app.services.report_service import run_pipeline
+from fastapi import Depends
+from app.core.security import verify_api_key
+from fastapi import Request
+from app.core.limiter import limiter
+
 
 router = APIRouter(prefix="/api", tags=["Reports & EDA"])
 
 
-@router.post("/generate-report")
-async def generate_report(
+@router.post("/generate-report",dependencies=[Depends(verify_api_key)])
+@limiter.limit("5/minute")
+def generate_report(
+    request : Request,
     file: UploadFile = File(...),
     target_column: Optional[str] = Form(None),
     id_columns: Optional[str] = Form(None),
@@ -39,7 +46,8 @@ async def generate_report(
         raise HTTPException(status_code=500, detail=str(exc))
 
 
-@router.get("/sample-report")
+@router.get("/sample-report",
+            dependencies=[Depends(verify_api_key)])
 def generate_sample_report():
     """
     Generate report using the bundled Cancer_Data.csv.
@@ -58,7 +66,7 @@ def generate_sample_report():
     return JSONResponse(content=result)
 
 
-@router.get("/reports/{filename}")
+@router.get("/reports/{filename}",dependencies=[Depends(verify_api_key)])
 def download_report(filename: str):
     """
     Download a generated PDF report.
@@ -72,3 +80,5 @@ def download_report(filename: str):
         filename=filename,
         media_type="application/pdf",
     )
+
+

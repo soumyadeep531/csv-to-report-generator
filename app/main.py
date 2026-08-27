@@ -4,11 +4,25 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.routers import health, report, web
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from app.core.limiter import limiter
+
 
 app = FastAPI(
     title="CSV to EDA & ML Report Generator",
     description="Automated Exploratory Data Analysis and Machine Learning Baseline Report Generator",
     version=settings.APP_VERSION,
+)
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter=limiter
+app.add_exception_handler(
+    RateLimitExceeded,
+    _rate_limit_exceeded_handler
 )
 
 app.add_middleware(

@@ -19,6 +19,8 @@ class Settings:
     STORAGE_DIR: Path = (
         Path(__file__).resolve().parent.parent / "storage"
     )
+    MAX_FILE_SIZE_MB: int = 10
+    API_KEY: str
 
     # Cancer_Data.csv settings
     TARGET_COLUMN: str = "diagnosis"
