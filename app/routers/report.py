@@ -46,7 +46,17 @@ def generate_sample_report():
     """
     sample_csv = Path(__file__).resolve().parent.parent.parent / "Cancer_Data.csv"
     if not sample_csv.exists():
-        raise HTTPException(status_code=404, detail="Cancer_Data.csv not found")
+        candidates = [
+            Path.cwd() / "Cancer_Data.csv",
+            Path(__file__).resolve().parent.parent / "Cancer_Data.csv",
+            Path(__file__).resolve().parent / "Cancer_Data.csv",
+        ]
+        for candidate in candidates:
+            if candidate.exists():
+                sample_csv = candidate
+                break
+        else:
+            raise HTTPException(status_code=404, detail="Cancer_Data.csv not found")
 
     df = pd.read_csv(sample_csv)
     result = run_pipeline(

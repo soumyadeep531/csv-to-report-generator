@@ -1,5 +1,9 @@
 import os
+import tempfile
 from pathlib import Path
+
+# Ensure Matplotlib uses a writable directory in serverless environments (prevents read-only FS errors)
+os.environ.setdefault("MPLCONFIGDIR", os.path.join(tempfile.gettempdir(), "matplotlib"))
 
 # Load .env file into environment
 _env_path = Path(__file__).resolve().parent.parent.parent / ".env"
@@ -12,13 +16,28 @@ if _env_path.exists():
                 os.environ.setdefault(_k.strip(), _v.strip().strip("'\""))
 
 
+def _resolve_storage_dir() -> Path:
+    # On Vercel, AWS Lambda, or other serverless platforms, always use writable /tmp
+    if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+        storage = Path(tempfile.gettempdir()) / "storage"
+    else:
+        storage = Path(__file__).resolve().parent.parent / "storage"
+
+    try:
+        storage.mkdir(parents=True, exist_ok=True)
+        return storage
+    except (OSError, PermissionError):
+        # Fallback to system temp directory if local path is on a read-only filesystem
+        storage = Path(tempfile.gettempdir()) / "storage"
+        storage.mkdir(parents=True, exist_ok=True)
+        return storage
+
+
 class Settings:
     APP_NAME: str = "autoeda-backend"
     APP_VERSION: str = "1.0.0"
 
-    STORAGE_DIR: Path = (
-        Path(__file__).resolve().parent.parent / "storage"
-    )
+    STORAGE_DIR: Path = _resolve_storage_dir()
 
     # Cancer_Data.csv settings
     TARGET_COLUMN: str = "diagnosis"
@@ -36,8 +55,3 @@ class Settings:
 
 
 settings = Settings()
-
-settings.STORAGE_DIR.mkdir(
-    parents=True,
-    exist_ok=True
-)
