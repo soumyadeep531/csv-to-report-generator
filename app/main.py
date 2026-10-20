@@ -1,3 +1,4 @@
+import os
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -5,10 +6,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.routers import health, report, web
 
+is_deployed = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+
 app = FastAPI(
     title="CSV to EDA & ML Report Generator",
     description="Automated Exploratory Data Analysis and Machine Learning Baseline Report Generator",
     version=settings.APP_VERSION,
+    docs_url=None if is_deployed else "/docs",
+    redoc_url=None if is_deployed else "/redoc",
+    openapi_url=None if is_deployed else "/openapi.json",
 )
 
 app.add_middleware(

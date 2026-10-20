@@ -613,11 +613,6 @@ def index_page():
             <span class="brand-mark" aria-hidden="true">f.</span>
             Fieldnote
         </a>
-        <div class="top-links">
-            <a href="/docs">API Docs</a>
-            <a href="/health">Health</a>
-            <a href="/redoc">ReDoc</a>
-        </div>
         <div class="top-status">Ready for analysis</div>
     </nav>
 
@@ -724,11 +719,7 @@ def index_page():
 
         <footer class="footer">
             <span>Analysis powered by Fieldnote Automated EDA & ML Engine.</span>
-            <div class="footer-links">
-                <a href="/docs">Swagger Docs</a>
-                <a href="/redoc">ReDoc</a>
-                <a href="/health">Health API</a>
-            </div>
+            <span>Private & In-Memory Processing</span>
         </footer>
     </main>
 
